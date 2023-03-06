@@ -12,7 +12,7 @@ def generate_grid():
    gridreward[0][3]=1
    gridreward[1][3]=-1
 
-   print(grid)
+   #print(grid)
 
    return grid,gridreward
 
@@ -157,10 +157,10 @@ def value_functions(grid,d):
  statevalues[2][2]=solutions[7]
  statevalues[2][3]=solutions[8]
 
- print("These are the State-Values")
- print("-------------------------")
- print(statevalues)
- print("-------------------------")
+ #print("These are the State-Values")
+ #print("-------------------------")
+ #print(statevalues)
+ #print("-------------------------")
 
  #-------------------------------------------------#
 
@@ -257,11 +257,11 @@ def value_functions(grid,d):
 
    actionvalues.append(l)
    
- print("  ")
- print("These are the Action-Values")
- print("-------------------------")
- print(actionvalues)                             # 1) It is a 2D array. For elements inside an individual array, the actions of U,D,R,L are calculated respectively
- print("-------------------------")              #    which means that the first element inside an array represent the action value of Up, the second element represent
+ #print("  ")
+ #print("These are the Action-Values")
+ #print("-------------------------")
+# print(actionvalues)                             # 1) It is a 2D array. For elements inside an individual array, the actions of U,D,R,L are calculated respectively
+ #print("-------------------------")              #    which means that the first element inside an array represent the action value of Up, the second element represent
                                                  #    the action value of Down, the third element represent the action value of Right, and the fourth value represent the
                                                  #    action value of Left. 
                                                  # 2) The number of arrays are 12, each of which represents the states in the Gridworld in ascending order.
@@ -270,9 +270,406 @@ def value_functions(grid,d):
  #-------------------------------------------------#
 
  return statevalues, actionvalues
+def policyiteration(state_values,action_values):
+
+ optimal_policy=np.empty(shape=(3,4),dtype=object)
+ ind=0
+ for i in range(0,3):
+    for j in range(0,4):
+      x=np.argmax(action_values[ind])
+      if (i == 0 and j == 3) or (i == 1 and j == 1) or (i == 1 and j == 3):
+          continue
+      if(x==0):
+         optimal_policy[i][j]='up'
+      elif x==1:
+       optimal_policy[i][j]='down'
+      elif x==2:
+        optimal_policy[i][j]='right'
+      elif x==3:
+        optimal_policy[i][j]='left'
+      ind+=1
+ #print(optimal_policy)
+
+ while(True):
+  while(True):
+     error=0
+     vs=0
+     for i in range(0,3):
+         for j in range(0,4):
+          if (i==0 and j==3) or (i==1 and j==1) or (i==1 and j==3):
+              continue
+          if optimal_policy[i][j]=='up':
+              if i-1<0:
+                  vs=state_values[i][j]*0.9
+              elif i-1==1 and j==1:
+                  vs=state_values[i][j]*0.9
+              else:
+                 vs=state_values[i-1][j]*0.9
+              if i-1==1 and j==3:
+               vs+=-1
+          elif optimal_policy[i][j]=='down':
+                if i+1>2:
+                    vs = state_values[i][j] * 0.9
+                elif i+1==1 and j==1:
+                    vs = state_values[i][j] * 0.9
+                else:
+                    vs=state_values[i+1][j]*0.9
+          elif optimal_policy[i][j]=='left':
+              if j-1<0:
+                  vs = state_values[i][j] * 0.9
+              elif i==1 and j-1==1:
+                  vs = state_values[i][j] * 0.9
+              else:
+                  vs=state_values[i][j-1]*0.9
+          else:
+             if j+1>3:
+                 vs = state_values[i][j] * 0.9
+             elif i == 1 and j + 1 == 1:
+                 vs = state_values[i][j] * 0.9
+             else:
+                 vs=state_values[i][j+1]*0.9
+             if (i==0 and j+1==3):
+                 vs+=1
+             elif(i==1 and j+1==3):
+                 vs+=-1
+          diff=abs(vs-state_values[i][j])
+          error=np.max([diff,error])
+          state_values[i][j]=vs
+     #print(error)
+     if error < 0.05:
+         break
+
+     # if optimal_policy[0]=='u' or optimal_policy=='l':
+     #     vs=0.9*state_values[0]
+     # elif optimal_policy[0]=='r':
+     #     vs=0.9*state_values[1]
+     # elif optimal_policy[0]=='d':
+     #     vs=0.9*state_values[3]
+     # diff=abs(vs-state_values[0])
+     # #print(diff)
+     # error=np.max([diff,error])
+     # state_values[0]=vs
+     # if optimal_policy[1] == 'u' :
+     #     vs = 0.9 * state_values[1]
+     # elif optimal_policy[1] == 'r':
+     #     vs = 0.9 * state_values[2]
+     # elif optimal_policy[1] == 'd':
+     #     vs = 0.9 * state_values[1]
+     # elif optimal_policy[1]=='l':
+     #     vs=0.9*state_values[0]
+     # diff = abs(vs - state_values[1])
+     # error = np.max([diff, error])
+     # state_values[1] = vs
+     # if optimal_policy[2] == 'u' :
+     #     vs = 0.9 * state_values[2]
+     # elif optimal_policy[2] == 'r':
+     #     vs = 1
+     # elif optimal_policy[2] == 'd':
+     #     vs = 0.9 * state_values[4]
+     # elif optimal_policy[2]=='l':
+     #     vs=0.9*state_values[1]
+     # diff = abs(vs - state_values[2])
+     # error=np.max([diff,error])
+     # state_values[2] = vs
+     # if optimal_policy[3] == 'u' :
+     #     vs = 0.9 * state_values[0]
+     # elif optimal_policy[3] == 'r':
+     #     vs = 0.9*state_values[3]
+     # elif optimal_policy[3] == 'd':
+     #     vs = 0.9 * state_values[5]
+     # elif optimal_policy[3]=='l':
+     #     vs=0.9*state_values[3]
+     # diff = abs(vs - state_values[3])
+     # error=np.max([diff,error])
+     # state_values[3] = vs
+     # if optimal_policy[4] == 'u' :
+     #     vs = 0.9 * state_values[2]
+     # elif optimal_policy[4] == 'r':
+     #     vs = -1
+     # elif optimal_policy[4] == 'd':
+     #     vs = 0.9 * state_values[7]
+     # elif optimal_policy[4]=='l':
+     #     vs=0.9*state_values[4]
+     # diff = abs(vs - state_values[4])
+     # error = np.max([diff, error])
+     # state_values[4] = vs
+     # if optimal_policy[5] == 'u':
+     #     vs = 0.9 * state_values[3]
+     # elif optimal_policy[5] == 'r':
+     #     vs = 0.9 * state_values[6]
+     # elif optimal_policy[5] == 'd':
+     #     vs = 0.9 * state_values[5]
+     # elif optimal_policy[5] == 'l':
+     #     vs = 0.9 * state_values[5]
+     # diff = abs(vs - state_values[5])
+     # error=np.max([diff,error])
+     # state_values[5] = vs
+     # if optimal_policy[6] == 'u':
+     #     vs = 0.9 * state_values[6]
+     # elif optimal_policy[6] == 'r':
+     #     vs = 0.9 * state_values[7]
+     # elif optimal_policy[6] == 'd':
+     #     vs = 0.9 * state_values[6]
+     # elif optimal_policy[6] == 'l':
+     #     vs = 0.9 * state_values[5]
+     # diff = abs(vs - state_values[6])
+     # error=np.max([diff,error])
+     # state_values[6] = vs
+     # if optimal_policy[7] == 'u':
+     #     vs = 0.9 * state_values[4]
+     # elif optimal_policy[7] == 'r':
+     #     vs = 0.9 * state_values[8]
+     # elif optimal_policy[7] == 'd':
+     #     vs = 0.9 * state_values[7]
+     # elif optimal_policy[7] == 'l':
+     #     vs = 0.9 * state_values[6]
+     # diff = abs(vs - state_values[7])
+     # error=np.max([diff,error])
+     # state_values[7] = vs
+     # if optimal_policy[8] == 'u':
+     #     vs = -1
+     # elif optimal_policy[8] == 'r':
+     #     vs = 0.9 * state_values[8]
+     # elif optimal_policy[8] == 'd':
+     #     vs = 0.9 * state_values[8]
+     # elif optimal_policy[8] == 'l':
+     #     vs = 0.9 * state_values[7]
+     # diff = abs(vs - state_values[8])
+     # error=np.max([diff,error])
+     # state_values[8] = vs
+
+     #print(error)
+  flag=True
+  for i in range(0,3):
+
+      for j in range(0,4):
+          if (i==1 and j==1) or (i==0 and j==3) or (i==1 and j==3):
+              continue
+          actions = np.array([0, 0, 0, 0], dtype=float)
+          if i-1<0:
+              actions[0]=state_values[i][j]*0.9
+          elif i-1==1 and j==1:
+              actions[0]=state_values[i][j]*0.9
+          else:
+              actions[0]=state_values[i-1][j]*0.9
+          if(i-1==1 and j==3):
+              actions[0]+=-1
+          if (i+1>2):
+              actions[1]=state_values[i][j]*0.9
+          elif i+1==1 and j==1:
+              actions[1]=state_values[i][j]*0.9
+          else:
+              actions[1]=state_values[i+1][j]*0.9
+          if (j-1<0):
+              actions[2]=state_values[i][j]*0.9
+          elif i==1 and j-1==1:
+              actions[2] = state_values[i][j] * 0.9
+          else:
+              actions[2]=state_values[i][j-1]*0.9
+          if j+1>3:
+              actions[3]=state_values[i][j]*0.9
+          elif i==1 and j+1==1:
+              actions[3]=state_values[i][j]*0.9
+          else:
+             actions[3]=state_values[i][j+1]*0.9
+          if i==0 and j+1==3:
+              actions[3]+=1
+          elif i==1 and j+1==3:
+             actions[3]+=-1
+          idx=np.argmax(actions)
+          action=''
+          if idx==0:
+             action='up'
+          elif idx==1:
+              action='down'
+          elif idx==2:
+              action='left'
+          else:
+            action='right'
+          if action!=optimal_policy[i][j]:
+              flag=False
+          optimal_policy[i][j]=action
+  #print(optimal_policy)
+  if flag==True:
+     break
+
+ return optimal_policy
+
+ #  actions=np.array([0,0,0,0],dtype=float)
+ #  actions[0]=0.9*state_values[0]
+ #  actions[1]=0.9*state_values[1]
+ #  actions[2]=0.9*state_values[3]
+ #  actions[3]=0.9*state_values[0]
+ #  max=np.argmax(actions)
+ #  action=''
+ #  if max==0:
+ #      action='u'
+ #  elif max==1:
+ #      action='r'
+ #  elif max==2:
+ #      action='d'
+ #  else:
+ #   action='l'
+ #  if action !=optimal_policy[0]:
+ #    flag=False
+ #  optimal_policy[0]=action
+ #  actions[0] = 0.9 * state_values[1]
+ #  actions[1] = 0.9 * state_values[2]
+ #  actions[2] = 0.9 * state_values[1]
+ #  actions[3] = 0.9 * state_values[0]
+ #  max = np.argmax(actions)
+ #  action = ''
+ #  if max == 0:
+ #      action = 'u'
+ #  elif max == 1:
+ #      action = 'r'
+ #  elif max == 2:
+ #      action = 'd'
+ #  else:
+ #      action = 'l'
+ #  if action != optimal_policy[1]:
+ #      flag = False
+ #  optimal_policy[1]=action
+ #  actions[0] = 0.9 * state_values[2]
+ #  actions[1] = 1
+ #  actions[2] = 0.9 * state_values[4]
+ #  actions[3] = 0.9 * state_values[1]
+ #  max = np.argmax(actions)
+ #  action = ''
+ #  if max == 0:
+ #      action = 'u'
+ #  elif max == 1:
+ #      action = 'r'
+ #  elif max == 2:
+ #      action = 'd'
+ #  else:
+ #      action = 'l'
+ #  if action != optimal_policy[2]:
+ #      flag = False
+ #  optimal_policy[2] = action
+ #
+ #  actions[0] = 0.9 * state_values[0]
+ #  actions[1] = 0.9 * state_values[3]
+ #  actions[2] = 0.9 * state_values[5]
+ #  actions[3] = 0.9 * state_values[3]
+ #  max = np.argmax(actions)
+ #  action = ''
+ #  if max == 0:
+ #      action = 'u'
+ #  elif max == 1:
+ #      action = 'r'
+ #  elif max == 2:
+ #      action = 'd'
+ #  else:
+ #      action = 'l'
+ #  if action != optimal_policy[3]:
+ #      flag = False
+ #  optimal_policy[3] = action
+ #  actions[0] = 0.9 * state_values[2]
+ #  actions[1] = -1
+ #  actions[2] = 0.9 * state_values[7]
+ #  actions[3] = 0.9 * state_values[4]
+ #  max = np.argmax(actions)
+ #  action = ''
+ #  if max == 0:
+ #      action = 'u'
+ #  elif max == 1:
+ #      action = 'r'
+ #  elif max == 2:
+ #      action = 'd'
+ #  else:
+ #      action = 'l'
+ #  if action != optimal_policy[4]:
+ #      flag = False
+ #  optimal_policy[4] = action
+ #  actions[0] = 0.9 * state_values[3]
+ #  actions[1] = 0.9*state_values[6]
+ #  actions[2] = 0.9 * state_values[5]
+ #  actions[3] = 0.9 * state_values[5]
+ #  max = np.argmax(actions)
+ #  action = ''
+ #  if max == 0:
+ #      action = 'u'
+ #  elif max == 1:
+ #      action = 'r'
+ #  elif max == 2:
+ #      action = 'd'
+ #  else:
+ #      action = 'l'
+ #  if action != optimal_policy[5]:
+ #      flag = False
+ #  optimal_policy[5] = action
+ #
+ #  actions[0] = 0.9 * state_values[6]
+ #  actions[1] = 0.9 * state_values[7]
+ #  actions[2] = 0.9 * state_values[6]
+ #  actions[3] = 0.9 * state_values[5]
+ #  max = np.argmax(actions)
+ #  action = ''
+ #  if max == 0:
+ #      action = 'u'
+ #  elif max == 1:
+ #      action = 'r'
+ #  elif max == 2:
+ #      action = 'd'
+ #  else:
+ #      action = 'l'
+ #  if action != optimal_policy[6]:
+ #      flag = False
+ #  optimal_policy[6] = action
+ #
+ #  actions[0] = 0.9 * state_values[4]
+ #  actions[1] = 0.9 * state_values[8]
+ #  actions[2] = 0.9 * state_values[7]
+ #  actions[3] = 0.9 * state_values[6]
+ #  max = np.argmax(actions)
+ #  action = ''
+ #  if max == 0:
+ #      action = 'u'
+ #  elif max == 1:
+ #      action = 'r'
+ #  elif max == 2:
+ #      action = 'd'
+ #  else:
+ #      action = 'l'
+ #  if action != optimal_policy[7]:
+ #      flag = False
+ #  optimal_policy[7] = action
+ #  actions[0] = -1
+ #  actions[1] = 0.9 * state_values[8]
+ #  actions[2] = 0.9 * state_values[8]
+ #  actions[3] = 0.9 * state_values[7]
+ #  max = np.argmax(actions)
+ #  action = ''
+ #  if max == 0:
+ #      action = 'u'
+ #  elif max == 1:
+ #      action = 'r'
+ #  elif max == 2:
+ #      action = 'd'
+ #  else:
+ #      action = 'l'
+ #  if action != optimal_policy[8]:
+ #      flag = False
+ #  optimal_policy[8] = action
+ #
+ #  print('flag',flag)
+ #  print(optimal_policy)
+ #  if flag==True:
+ #      break
+ # return optimal_policy
+
 
 if __name__ == '__main__':
 
  grid,gridreward=generate_grid()
- Values=value_functions(gridreward,0.9)
+ state_values,action_values=value_functions(gridreward,0.9)
+ action_values=np.delete(action_values,[3,5,7],axis=0)
+ #print(action_values.shape)
+ #state_values=state_values.flatten()
+ #state_values=np.delete(state_values,[3,5,7])
+ #print(state_values)
+ #optimal_policy=policyiteration(state_values,action_values)
+ optimal_policy = policyiteration(np.zeros(shape=(9,9)), np.zeros(shape=(9,4)))
+print(optimal_policy)
 
