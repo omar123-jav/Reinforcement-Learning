@@ -493,7 +493,7 @@ def policyiteration(state_values,action_values):
   if flag==True:
      break
 
- return optimal_policy
+ return optimal_policy,state_values
 
  #  actions=np.array([0,0,0,0],dtype=float)
  #  actions[0]=0.9*state_values[0]
@@ -670,6 +670,10 @@ if __name__ == '__main__':
  #state_values=np.delete(state_values,[3,5,7])
  #print(state_values)
  #optimal_policy=policyiteration(state_values,action_values)
- optimal_policy = policyiteration(np.zeros(shape=(9,9)), np.zeros(shape=(9,4)))
-print(optimal_policy)
+ optimal_policy,statevalues = policyiteration(np.zeros(shape=(3,4)), np.zeros(shape=(9,4)))
+ print("State Values:")
+ print(statevalues)
+ print("----------------")
+ print("Optimal Policy:")
+ print(optimal_policy)
 
