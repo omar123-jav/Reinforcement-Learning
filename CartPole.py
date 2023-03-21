@@ -48,7 +48,7 @@ qtable=np.zeros(shape=(16,2))
 episode=1
 epsilone=0.05
 #print(qtable)
-for _ in range(50):
+for _ in range(500):
     state,info = env.reset()
     run=0
     totalreward=0
@@ -56,7 +56,7 @@ for _ in range(50):
       action=-1
 
       st_idx = state_idx(state[0], state[2])
-     # print(state[0],state[2],st_idx)
+      #print(state[0],state[2],st_idx)
       if np.random.rand()<epsilone:
          action=random.randrange(0,2,1)
       else:
@@ -67,8 +67,9 @@ for _ in range(50):
       totalreward+=reward
       state_next_idx=state_idx(state_next[0],state_next[2])
       run += 1
-      if  truncated:
-          qtable[st_idx][action] = qtable[st_idx][action] + 0.01 * (reward- qtable[st_idx][action])
+      if  terminated:
+          qtable[st_idx][action] = qtable[st_idx][action] + 0.1 * (reward- qtable[st_idx][action])
+          print(state_next[0],state_next[2])
           print('Episode',episode,':')
           print()
           print('Qtable:')
@@ -83,7 +84,7 @@ for _ in range(50):
 
 
 
-      qtable[st_idx][action]=qtable[st_idx][action]+0.01*(reward+np.max(qtable[state_next_idx])-qtable[st_idx][action])
+      qtable[st_idx][action]=qtable[st_idx][action]+0.1*(reward+np.max(qtable[state_next_idx])-qtable[st_idx][action])
       state=state_next
       #print(state_next,reward)
 
