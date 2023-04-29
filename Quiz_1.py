@@ -1,9 +1,12 @@
 import numpy as np
-import matplotlib.pyplot as plt 
 import time
 import gym
-import math
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
+import math
+import pygame
 class Q_Learning:
      
     def __init__(self,env,alpha,gamma,epsilon,numberEpisodes,bins,lowerBounds,upperBounds):
@@ -165,7 +168,7 @@ if __name__ == '__main__':
 
     (obtainedRewardsOptimal,env1) = Q1.optimal_Policy()
     
-    plt.figure(figsize = (12, 5))
+
     plt.plot(Q1.sumRewardsEpisode,color='blue',linewidth=1)
     plt.xlabel('Episode')
     plt.ylabel('Reward')

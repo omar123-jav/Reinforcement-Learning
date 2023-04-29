@@ -25,9 +25,9 @@ def predict(epochs):
 
      for i in range(epochs):
 
-        w,b = gradientDescent(x,y,w,b,alpha,m)
+        w,b = gradientDescent(x, y,w,b,alpha,N)
         yhat = w*x +b
-        J = np.divide(np.sum((y-yhat)**2, axis=0), m)
+        J = np.divide(np.sum((y-yhat)**2, axis=0), N)
         print(f'{epochs} loss is {J}, parameters w:{w}, b:{b}')
 
 def LSM(x,y,N):

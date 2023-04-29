@@ -639,17 +639,17 @@ def state_idx(position,angle,velocity,angularvelocity):
                      return 257
 
 
+if __name__ == '__main__':
 
-
-env=gym.make('CartPole-v1')
-qtable=np.random.rand(258,2)
-qtable[0][0]=0
-qtable[0][1]=0
-episode=1
-epsilone=0.05
+ env=gym.make('CartPole-v1')
+ qtable=np.random.rand(258,2)
+ qtable[0][0]=0
+ qtable[0][1]=0
+ episode=1
+ epsilone=0.05
 #rewards=[]
 #print(qtable)
-for _ in range(500):
+ for _ in range(500):
     state,info = env.reset()
     #print(state[0],state[2])
     run=0
@@ -669,6 +669,7 @@ for _ in range(500):
       state_next, reward, terminated, truncated, info = env.step(action)
       totalreward+=reward
       state_next_idx=state_idx(state_next[0],state_next[2],state_next[1],state_next[3])
+      #print(st_idx)
       run += 1
       if  terminated:
           qtable[st_idx][action] = qtable[st_idx][action] + 0.1 * (reward- qtable[st_idx][action])
@@ -695,6 +696,6 @@ for _ in range(500):
 
     episode+=1
 
-env.close()
+ env.close()
 
 
